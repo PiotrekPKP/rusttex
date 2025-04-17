@@ -136,7 +136,15 @@ impl ContentBuilder {
             | Environment::FlushLeft
             | Environment::FlushRight
             | Environment::Itemize
-            | Environment::Math => {
+            | Environment::Math
+            | Environment::Quotation
+            | Environment::Quote
+            | Environment::Tabbing
+            | Environment::Theorem
+            | Environment::TitlePage
+            | Environment::TrivList
+            | Environment::Verbatim
+            | Environment::Verse => {
                 self.content
                     .push_str(&format!("\\begin{{{}}}\n", env.to_string()));
                 self.content.push_str(&format!("{}\n", content.merge_str()));
@@ -159,21 +167,119 @@ impl ContentBuilder {
                     .push_str(&format!("\\end{{{}}}\n", env.to_string()));
             }
             Environment::Figure(params) => {
-                let placement = if params.placement.is_empty() {
-                    String::new()
+                self.content.push_str(&format!(
+                    "\\begin{{{}}}{}\n",
+                    env.to_string(),
+                    &params.placement
+                ));
+                self.content.push_str(&format!("{}\n", content.merge_str()));
+                self.content
+                    .push_str(&format!("\\end{{{}}}\n", env.to_string()));
+            }
+            Environment::FileContents(params) => {
+                let options = params
+                    .option
+                    .as_ref()
+                    .map_or(String::new(), |o| format!("[{}]", o.to_string()));
+                self.content.push_str(&format!(
+                    "\\begin{{{}}}{}{{{}}}\n",
+                    env.to_string(),
+                    options,
+                    &params.filename,
+                ));
+                self.content.push_str(&format!("{}\n", content.merge_str()));
+                self.content
+                    .push_str(&format!("\\end{{{}}}\n", env.to_string()));
+            }
+            Environment::List(params) => {
+                self.content.push_str(&format!(
+                    "\\begin{{{}}}{}{}\n",
+                    env.to_string(),
+                    &params.labeling,
+                    &params.spacing,
+                ));
+                self.content.push_str(&format!("{}\n", content.merge_str()));
+                self.content
+                    .push_str(&format!("\\end{{{}}}\n", env.to_string()));
+            }
+            Environment::Minipage(params) => {
+                let position = params
+                    .position
+                    .as_ref()
+                    .map_or(String::from("[]"), |p| format!("[{}]", p.merge_str()));
+                let height = params
+                    .height
+                    .as_ref()
+                    .map_or(String::from("[]"), |h| format!("[{}]", h.merge_str()));
+                let inner_pos = params
+                    .inner_pos
+                    .as_ref()
+                    .map_or(String::from("[]"), |i| format!("[{}]", i.merge_str()));
+                self.content.push_str(&format!(
+                    "\\begin{{{}}}{}{}{}{{{}}}\n",
+                    env.to_string(),
+                    position,
+                    height,
+                    inner_pos,
+                    &params.width
+                ));
+                self.content.push_str(&format!("{}\n", content.merge_str()));
+                self.content
+                    .push_str(&format!("\\end{{{}}}\n", env.to_string()));
+            }
+            Environment::Picture(params) => {
+                let size = format!("({},{})", &params.size.0, &params.size.1);
+                let offset = if let Some((x, y)) = &params.offset {
+                    format!("({},{})", x, y)
                 } else {
-                    format!("[{}]", params.placement)
+                    String::new()
                 };
-
+                self.content.push_str(&format!(
+                    "\\begin{{{}}}{}{}\n",
+                    env.to_string(),
+                    size,
+                    offset
+                ));
+                self.content.push_str(&format!("{}\n", content.merge_str()));
+                self.content
+                    .push_str(&format!("\\end{{{}}}\n", env.to_string()));
+            }
+            Environment::Table(params) => {
+                let placement = params
+                    .placement
+                    .as_ref()
+                    .map_or(String::new(), |p| format!("[{}]", p.merge_str()));
                 self.content
                     .push_str(&format!("\\begin{{{}}}{}\n", env.to_string(), placement));
                 self.content.push_str(&format!("{}\n", content.merge_str()));
                 self.content
                     .push_str(&format!("\\end{{{}}}\n", env.to_string()));
             }
-            Environment::FileContents(params) => {}
-            Environment::List(params) => {}
-            Environment::Minipage(params) => {}
+            Environment::Tabular(params) => {
+                let pos = params
+                    .pos
+                    .as_ref()
+                    .map_or(String::new(), |p| format!("[{}]", p.merge_str()));
+                self.content.push_str(&format!(
+                    "\\begin{{{}}}{}{{{}}}\n",
+                    env.to_string(),
+                    pos,
+                    params.cols
+                ));
+                self.content.push_str(&format!("{}\n", content.merge_str()));
+                self.content
+                    .push_str(&format!("\\end{{{}}}\n", env.to_string()));
+            }
+            Environment::TheBibliography(params) => {
+                self.content.push_str(&format!(
+                    "\\begin{{{}}}{{{}}}\n",
+                    env.to_string(),
+                    &params.widest_label,
+                ));
+                self.content.push_str(&format!("{}\n", content.merge_str()));
+                self.content
+                    .push_str(&format!("\\end{{{}}}\n", env.to_string()));
+            }
         }
     }
 }

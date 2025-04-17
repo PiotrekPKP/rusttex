@@ -130,6 +130,61 @@ impl MinipageParams {
     }
 }
 
+pub struct PictureParams {
+    pub size: (String, String),
+    pub offset: Option<(String, String)>,
+}
+
+impl PictureParams {
+    pub fn new<S: StringOrBuilder, V: StringOrBuilder>(
+        size: (S, S),
+        offset: Option<(V, V)>,
+    ) -> Self {
+        PictureParams {
+            size: (size.0.merge_str(), size.1.merge_str()),
+            offset: offset.map(|o| (o.0.merge_str(), o.1.merge_str())),
+        }
+    }
+}
+
+pub struct TableParams {
+    pub placement: Option<String>,
+}
+
+impl TableParams {
+    pub fn new<S: StringOrBuilder>(placement: Option<S>) -> Self {
+        TableParams {
+            placement: placement.map(|p| p.merge_str()),
+        }
+    }
+}
+
+pub struct TabularParams {
+    pub cols: String,
+    pub pos: Option<String>,
+}
+
+impl TabularParams {
+    pub fn new<S: StringOrBuilder, V: StringOrBuilder>(cols: S, pos: Option<V>) -> Self {
+        TabularParams {
+            pos: pos.map(|p| p.merge_str()),
+            cols: cols.merge_str(),
+        }
+    }
+}
+
+pub struct TheBubliographyParams {
+    pub widest_label: String,
+}
+
+impl TheBubliographyParams {
+    pub fn new<S: StringOrBuilder>(widest_label: S) -> Self {
+        TheBubliographyParams {
+            widest_label: widest_label.merge_str(),
+        }
+    }
+}
+
 pub enum Environment<'a> {
     Abstract,
     Array(&'a ArrayParams),
@@ -148,6 +203,18 @@ pub enum Environment<'a> {
     List(&'a ListParams),
     Math,
     Minipage(&'a MinipageParams),
+    Picture(&'a PictureParams),
+    Quotation,
+    Quote,
+    Tabbing,
+    Table(&'a TableParams),
+    Tabular(&'a TabularParams),
+    TheBibliography(&'a TheBubliographyParams),
+    Theorem,
+    TitlePage,
+    TrivList,
+    Verbatim,
+    Verse,
 }
 
 impl<'a> ToString for Environment<'a> {
@@ -170,6 +237,18 @@ impl<'a> ToString for Environment<'a> {
             Environment::List(_) => String::from("list"),
             Environment::Math => String::from("math"),
             Environment::Minipage(_) => String::from("minipage"),
+            Environment::Picture(_) => String::from("picture"),
+            Environment::Quotation => String::from("quotation"),
+            Environment::Quote => String::from("quote"),
+            Environment::Tabbing => String::from("tabbing"),
+            Environment::Table(_) => String::from("table"),
+            Environment::Tabular(_) => String::from("tabular"),
+            Environment::TheBibliography(_) => String::from("thebibliography"),
+            Environment::Theorem => String::from("theorem"),
+            Environment::TitlePage => String::from("titlepage"),
+            Environment::TrivList => String::from("trivlist"),
+            Environment::Verbatim => String::from("verbatim"),
+            Environment::Verse => String::from("verse"),
         }
     }
 }
