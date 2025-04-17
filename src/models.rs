@@ -33,6 +33,26 @@ pub enum DocumentClassOptions {
     Custom(String),
 }
 
+pub enum ColorModel {
+    CMYK,
+    Gray,
+    RGB,
+    RGBFull,
+    Named
+}
+
+impl ToString for ColorModel {
+    fn to_string(&self) -> String {
+        match &self {
+            ColorModel::CMYK => String::from("cmyk"),
+            ColorModel::Gray => String::from("gray"),
+            ColorModel::RGB => String::from("rgb"),
+            ColorModel::RGBFull => String::from("rgbfull"),
+            ColorModel::Named => String::from("named"),
+        }
+    }
+}
+
 pub struct ArrayParams {
     pub cols: String,
     pub pos: Option<String>,

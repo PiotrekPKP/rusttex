@@ -128,6 +128,105 @@ impl ContentBuilder {
             .push_str(&format!("\\label{{{}}}\n", label.merge_str()));
     }
 
+    pub fn section<S: StringOrBuilder>(&mut self, title: S) {
+        self.content
+            .push_str(&format!("\\section{{{}}}\n", title.merge_str()));
+    }
+
+    pub fn subsection<S: StringOrBuilder>(&mut self, title: S) {
+        self.content
+            .push_str(&format!("\\subsection{{{}}}\n", title.merge_str()));
+    }
+
+    pub fn subsubsection<S: StringOrBuilder>(&mut self, title: S) {
+        self.content
+            .push_str(&format!("\\subsubsection{{{}}}\n", title.merge_str()));
+    }
+
+    pub fn paragraph<S: StringOrBuilder>(&mut self, text: S) {
+        self.content
+            .push_str(&format!("\\paragraph{{{}}}\n", text.merge_str()));
+    }
+
+    pub fn subparagraph<S: StringOrBuilder>(&mut self, text: S) {
+        self.content
+            .push_str(&format!("\\subparagraph{{{}}}\n", text.merge_str()));
+    }
+
+    pub fn footnote<S: StringOrBuilder>(&mut self, text: S) {
+        self.content
+            .push_str(&format!("\\footnote{{{}}}", text.merge_str()));
+    }
+
+    pub fn cite<S: StringOrBuilder, V: StringOrBuilder>(&mut self, citation: S, subcitation: Option<V>) {
+        let subcitation_str = match subcitation {
+            Some(sub) => format!("[{}]", sub.merge_str()),
+            None => String::new(),
+        };
+        self.content
+            .push_str(&format!("\\cite{}{{{}}}", subcitation_str, citation.merge_str()));
+    }
+
+    pub fn ref_label<S: StringOrBuilder>(&mut self, label: S) {
+        self.content
+            .push_str(&format!("\\ref{{{}}}", label.merge_str()));
+    }
+
+    pub fn text_color<S: StringOrBuilder, V: StringOrBuilder>(&mut self, text: S, color: V, color_model: Option<ColorModel>) {
+        let color_model_str = match color_model {
+            Some(model) => format!("[{}]", model.to_string()),
+            None => String::new(),
+        };
+        self.content.push_str(&format!(
+            "\\textcolor{}{{{}}}{{{}}}",
+            color_model_str,
+            color.merge_str(),
+            text.merge_str()
+        ));
+    }
+
+    pub fn hspace<S: StringOrBuilder>(&mut self, length: S) {
+        self.content.push_str(&format!("\\hspace{{{}}}", length.merge_str()));
+    }
+
+    pub fn vspace<S: StringOrBuilder>(&mut self, length: S) {
+        self.content.push_str(&format!("\\vspace{{{}}}", length.merge_str()));
+    }
+
+    pub fn include<S: StringOrBuilder>(&mut self, filename: S) {
+        self.content
+            .push_str(&format!("\\include{{{}}}\n", filename.merge_str()));
+    }
+
+    pub fn input<S: StringOrBuilder>(&mut self, filename: S) {
+        self.content
+            .push_str(&format!("\\input{{{}}}\n", filename.merge_str()));
+    }
+
+    pub fn clear_page(&mut self) {
+        self.content.push_str("\\clearpage\n");
+    }
+
+    pub fn new_page(&mut self) {
+        self.content.push_str("\\newpage\n");
+    }
+
+    pub fn line_break(&mut self) {
+        self.content.push_str("\\linebreak\n");
+    }
+
+    pub fn page_break(&mut self) {
+        self.content.push_str("\\pagebreak\n");
+    }
+
+    pub fn no_indent(&mut self) {
+        self.content.push_str("\\noindent\n");
+    }
+
+    pub fn centering(&mut self) {
+        self.content.push_str("\\centering\n");
+    }
+
     pub fn env<S: StringOrBuilder>(&mut self, env: Environment, content: S) {
         match env {
             Environment::Abstract
