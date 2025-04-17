@@ -489,7 +489,7 @@ impl TheBubliographyParams {
 /// ```rust
 /// use rusttex::{Environment, ArrayParams};
 ///
-/// let env = Environment::Array(&ArrayParams::new("c|c", Some("t")));
+/// let env = Environment::Array(&ArrayParams::new("c|c", Some("t")), "...");
 /// ```
 ///
 /// **Generated LaTeX:**
