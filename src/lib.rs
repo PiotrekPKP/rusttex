@@ -227,6 +227,11 @@ impl ContentBuilder {
         self.content.push_str("\\centering\n");
     }
 
+    pub fn itemize<S: StringOrBuilder>(&mut self, content: S) {
+        self.content
+            .push_str(&format!("\\item {{{}}}\n", content.merge_str()));
+    }
+
     pub fn env<S: StringOrBuilder>(&mut self, env: Environment, content: S) {
         match env {
             Environment::Abstract
