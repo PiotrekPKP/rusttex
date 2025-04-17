@@ -6,7 +6,7 @@ pub enum DocumentClass {
     Letter,
     Report,
     Slides,
-    Custom(String)
+    Custom(String),
 }
 
 pub enum DocumentClassOptions {
@@ -30,7 +30,7 @@ pub enum DocumentClassOptions {
     TwoSide,
     OpenRight,
     OpenAny,
-    Custom(String)
+    Custom(String),
 }
 
 pub struct ArrayParams {
@@ -40,7 +40,10 @@ pub struct ArrayParams {
 
 impl ArrayParams {
     pub fn new<S: StringOrBuilder, V: StringOrBuilder>(cols: S, pos: Option<V>) -> Self {
-        ArrayParams { pos: pos.map(|p| p.merge_str()), cols: cols.merge_str() }
+        ArrayParams {
+            pos: pos.map(|p| p.merge_str()),
+            cols: cols.merge_str(),
+        }
     }
 }
 
@@ -50,7 +53,9 @@ pub struct FigureParams {
 
 impl FigureParams {
     pub fn new<S: StringOrBuilder>(placement: S) -> Self {
-        FigureParams { placement: placement.merge_str() }
+        FigureParams {
+            placement: placement.merge_str(),
+        }
     }
 }
 
@@ -74,14 +79,54 @@ impl ToString for FileContentsOption {
     }
 }
 
-pub struct FileContentsParams{
+pub struct FileContentsParams {
     pub filename: String,
     pub option: Option<FileContentsOption>,
 }
 
 impl FileContentsParams {
     pub fn new<S: StringOrBuilder>(filename: S, option: Option<FileContentsOption>) -> Self {
-        FileContentsParams { filename: filename.merge_str(), option }
+        FileContentsParams {
+            filename: filename.merge_str(),
+            option,
+        }
+    }
+}
+
+pub struct ListParams {
+    pub labeling: String,
+    pub spacing: String,
+}
+
+impl ListParams {
+    pub fn new<S: StringOrBuilder, V: StringOrBuilder>(labeling: S, spacing: V) -> Self {
+        ListParams {
+            labeling: labeling.merge_str(),
+            spacing: spacing.merge_str(),
+        }
+    }
+}
+
+pub struct MinipageParams {
+    pub position: Option<String>,
+    pub height: Option<String>,
+    pub inner_pos: Option<String>,
+    pub width: String,
+}
+
+impl MinipageParams {
+    pub fn new<S: StringOrBuilder, V: StringOrBuilder, T: StringOrBuilder, U: StringOrBuilder>(
+        position: Option<S>,
+        height: Option<V>,
+        inner_pos: Option<T>,
+        width: U,
+    ) -> Self {
+        MinipageParams {
+            position: position.map(|p| p.merge_str()),
+            height: height.map(|h| h.merge_str()),
+            inner_pos: inner_pos.map(|i| i.merge_str()),
+            width: width.merge_str(),
+        }
     }
 }
 
@@ -96,6 +141,13 @@ pub enum Environment<'a> {
     EqnArray,
     Equation,
     Figure(&'a FigureParams),
+    FileContents(&'a FileContentsParams),
+    FlushLeft,
+    FlushRight,
+    Itemize,
+    List(&'a ListParams),
+    Math,
+    Minipage(&'a MinipageParams),
 }
 
 impl<'a> ToString for Environment<'a> {
@@ -111,6 +163,13 @@ impl<'a> ToString for Environment<'a> {
             Environment::EqnArray => String::from("eqnarray"),
             Environment::Equation => String::from("equation"),
             Environment::Figure(_) => String::from("figure"),
+            Environment::FileContents(_) => String::from("filecontents"),
+            Environment::FlushLeft => String::from("flushleft"),
+            Environment::FlushRight => String::from("flushright"),
+            Environment::Itemize => String::from("itemize"),
+            Environment::List(_) => String::from("list"),
+            Environment::Math => String::from("math"),
+            Environment::Minipage(_) => String::from("minipage"),
         }
     }
 }

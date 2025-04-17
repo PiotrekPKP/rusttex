@@ -17,7 +17,7 @@ pub struct ContentBuilder {
     content: String,
 }
 
-impl<F> StringOrBuilder for F 
+impl<F> StringOrBuilder for F
 where
     F: FnOnce(&mut ContentBuilder),
 {
@@ -30,28 +30,51 @@ where
 
 impl ContentBuilder {
     pub fn new() -> Self {
-        ContentBuilder { content: String::from("") }
+        ContentBuilder {
+            content: String::from(""),
+        }
     }
 
     pub fn build_document(&self) -> &str {
         &self.content
     }
 
-    pub fn set_document_class(&mut self, document_class: DocumentClass, options: Vec<Box<dyn ToString>>) {
+    pub fn set_document_class(
+        &mut self,
+        document_class: DocumentClass,
+        options: Vec<Box<dyn ToString>>,
+    ) {
         if options.is_empty() {
-            self.content.push_str(&format!("\\documentclass{{{}}}\n", document_class.to_string()));
+            self.content.push_str(&format!(
+                "\\documentclass{{{}}}\n",
+                document_class.to_string()
+            ));
         } else {
-            let options_str = options.iter().map(|o| o.to_string()).collect::<Vec<String>>().join(",");
-            self.content.push_str(&format!("\\documentclass[{}]{{{}}}\n", options_str, document_class.to_string()));
+            let options_str = options
+                .iter()
+                .map(|o| o.to_string())
+                .collect::<Vec<String>>()
+                .join(",");
+            self.content.push_str(&format!(
+                "\\documentclass[{}]{{{}}}\n",
+                options_str,
+                document_class.to_string()
+            ));
         }
     }
 
     pub fn use_package(&mut self, package: &str, options: Vec<Box<dyn ToString>>) {
         if options.is_empty() {
-            self.content.push_str(&format!("\\usepackage{{{}}}\n", package));
+            self.content
+                .push_str(&format!("\\usepackage{{{}}}\n", package));
         } else {
-            let options_str = options.iter().map(|o| o.to_string()).collect::<Vec<String>>().join(",");
-            self.content.push_str(&format!("\\usepackage[{}]{{{}}}\n", options_str, package));
+            let options_str = options
+                .iter()
+                .map(|o| o.to_string())
+                .collect::<Vec<String>>()
+                .join(",");
+            self.content
+                .push_str(&format!("\\usepackage[{}]{{{}}}\n", options_str, package));
         }
     }
 
@@ -68,11 +91,13 @@ impl ContentBuilder {
     }
 
     pub fn title<S: StringOrBuilder>(&mut self, title: S) {
-        self.content.push_str(&format!("\\title{{{}}}\n", title.merge_str()));
+        self.content
+            .push_str(&format!("\\title{{{}}}\n", title.merge_str()));
     }
-    
+
     pub fn author<S: StringOrBuilder>(&mut self, author: S) {
-        self.content.push_str(&format!("\\author{{{}}}\n", author.merge_str()));
+        self.content
+            .push_str(&format!("\\author{{{}}}\n", author.merge_str()));
     }
 
     pub fn maketitle(&mut self) {
@@ -80,15 +105,18 @@ impl ContentBuilder {
     }
 
     pub fn text_bold<S: StringOrBuilder>(&mut self, text: S) {
-        self.content.push_str(&format!("\\textbf{{{}}}", text.merge_str()));
+        self.content
+            .push_str(&format!("\\textbf{{{}}}", text.merge_str()));
     }
 
     pub fn text_italic<S: StringOrBuilder>(&mut self, text: S) {
-        self.content.push_str(&format!("\\textit{{{}}}", text.merge_str()));
+        self.content
+            .push_str(&format!("\\textit{{{}}}", text.merge_str()));
     }
 
     pub fn text_underline<S: StringOrBuilder>(&mut self, text: S) {
-        self.content.push_str(&format!("\\underline{{{}}}", text.merge_str()));
+        self.content
+            .push_str(&format!("\\underline{{{}}}", text.merge_str()));
     }
 
     pub fn new_line(&mut self) {
@@ -98,23 +126,38 @@ impl ContentBuilder {
     pub fn env<S: StringOrBuilder>(&mut self, env: Environment, content: S) {
         match env {
             Environment::Abstract
-            |Environment::Center
-            |Environment::Description
-            |Environment::DisplayMath
-            |Environment::Document
-            |Environment::Enumerate
-            |Environment::EqnArray
-            |Environment::Equation => {
-                self.content.push_str(&format!("\\begin{{{}}}\n", env.to_string()));
+            | Environment::Center
+            | Environment::Description
+            | Environment::DisplayMath
+            | Environment::Document
+            | Environment::Enumerate
+            | Environment::EqnArray
+            | Environment::Equation
+            | Environment::FlushLeft
+            | Environment::FlushRight
+            | Environment::Itemize
+            | Environment::Math => {
+                self.content
+                    .push_str(&format!("\\begin{{{}}}\n", env.to_string()));
                 self.content.push_str(&format!("{}\n", content.merge_str()));
-                self.content.push_str(&format!("\\end{{{}}}\n", env.to_string()));
-            },
+                self.content
+                    .push_str(&format!("\\end{{{}}}\n", env.to_string()));
+            }
             Environment::Array(params) => {
-                let pos = params.pos.as_ref().map_or(String::new(), |p| format!("[{}]", p.merge_str()));
-                self.content.push_str(&format!("\\begin{{{}}}{}{{{}}}\n", env.to_string(), pos, params.cols));
+                let pos = params
+                    .pos
+                    .as_ref()
+                    .map_or(String::new(), |p| format!("[{}]", p.merge_str()));
+                self.content.push_str(&format!(
+                    "\\begin{{{}}}{}{{{}}}\n",
+                    env.to_string(),
+                    pos,
+                    params.cols
+                ));
                 self.content.push_str(&format!("{}\n", content.merge_str()));
-                self.content.push_str(&format!("\\end{{{}}}\n", env.to_string()));
-            },
+                self.content
+                    .push_str(&format!("\\end{{{}}}\n", env.to_string()));
+            }
             Environment::Figure(params) => {
                 let placement = if params.placement.is_empty() {
                     String::new()
@@ -122,10 +165,15 @@ impl ContentBuilder {
                     format!("[{}]", params.placement)
                 };
 
-                self.content.push_str(&format!("\\begin{{{}}}{}\n", env.to_string(), placement));
+                self.content
+                    .push_str(&format!("\\begin{{{}}}{}\n", env.to_string(), placement));
                 self.content.push_str(&format!("{}\n", content.merge_str()));
-                self.content.push_str(&format!("\\end{{{}}}\n", env.to_string()));
+                self.content
+                    .push_str(&format!("\\end{{{}}}\n", env.to_string()));
             }
+            Environment::FileContents(params) => {}
+            Environment::List(params) => {}
+            Environment::Minipage(params) => {}
         }
     }
 }
