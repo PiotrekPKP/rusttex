@@ -15,7 +15,7 @@ Add the following to your `Cargo.toml`:
 
 ```toml
 [dependencies]
-rusttex = "0.1.0"
+rusttex = "0.1.1"
 ```
 
 ## Usage

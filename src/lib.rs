@@ -18,7 +18,7 @@
 //! 
 //! ```toml
 //! [dependencies]
-//! rusttex = "0.1.0"
+//! rusttex = "0.1.1"
 //! ```
 //! 
 //! ## Usage
@@ -171,6 +171,8 @@
 //! ## Contributing
 //! 
 //! Contributions are welcome! Feel free to open issues or submit pull requests to improve RustTeX.
+
+#![warn(missing_docs)]
 
 pub mod models;
 pub mod utils;
