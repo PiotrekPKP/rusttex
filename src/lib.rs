@@ -18,7 +18,7 @@
 //! 
 //! ```toml
 //! [dependencies]
-//! rusttex = "0.1.1"
+//! rusttex = "0.1.2"
 //! ```
 //! 
 //! ## Usage
