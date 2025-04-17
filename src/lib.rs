@@ -123,6 +123,11 @@ impl ContentBuilder {
         self.content.push_str("\\\\\n");
     }
 
+    pub fn label<S: StringOrBuilder>(&mut self, label: S) {
+        self.content
+            .push_str(&format!("\\label{{{}}}\n", label.merge_str()));
+    }
+
     pub fn env<S: StringOrBuilder>(&mut self, env: Environment, content: S) {
         match env {
             Environment::Abstract
