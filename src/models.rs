@@ -44,9 +44,75 @@ impl ArrayParams {
     }
 }
 
-pub enum Environment {
+pub struct FigureParams {
+    pub placement: String,
+}
+
+impl FigureParams {
+    pub fn new<S: StringOrBuilder>(placement: S) -> Self {
+        FigureParams { placement: placement.merge_str() }
+    }
+}
+
+pub enum FileContentsOption {
+    Force,
+    Overwrite,
+    NoHeader,
+    NoSearch,
+    Custom(String),
+}
+
+impl ToString for FileContentsOption {
+    fn to_string(&self) -> String {
+        match &self {
+            FileContentsOption::Force => String::from("force"),
+            FileContentsOption::Overwrite => String::from("overwrite"),
+            FileContentsOption::NoHeader => String::from("noheader"),
+            FileContentsOption::NoSearch => String::from("nosearch"),
+            FileContentsOption::Custom(custom) => custom.clone(),
+        }
+    }
+}
+
+pub struct FileContentsParams{
+    pub filename: String,
+    pub option: Option<FileContentsOption>,
+}
+
+impl FileContentsParams {
+    pub fn new<S: StringOrBuilder>(filename: S, option: Option<FileContentsOption>) -> Self {
+        FileContentsParams { filename: filename.merge_str(), option }
+    }
+}
+
+pub enum Environment<'a> {
     Abstract,
-    Array(ArrayParams),
+    Array(&'a ArrayParams),
+    Center,
+    Description,
+    DisplayMath,
+    Document,
+    Enumerate,
+    EqnArray,
+    Equation,
+    Figure(&'a FigureParams),
+}
+
+impl<'a> ToString for Environment<'a> {
+    fn to_string(&self) -> String {
+        match &self {
+            Environment::Abstract => String::from("abstract"),
+            Environment::Array(_) => String::from("array"),
+            Environment::Center => String::from("center"),
+            Environment::Description => String::from("description"),
+            Environment::DisplayMath => String::from("displaymath"),
+            Environment::Document => String::from("document"),
+            Environment::Enumerate => String::from("enumerate"),
+            Environment::EqnArray => String::from("eqnarray"),
+            Environment::Equation => String::from("equation"),
+            Environment::Figure(_) => String::from("figure"),
+        }
+    }
 }
 
 impl ToString for DocumentClass {

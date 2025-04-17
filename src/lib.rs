@@ -24,7 +24,7 @@ where
     fn merge_str(self) -> String {
         let mut builder = ContentBuilder::new();
         self(&mut builder);
-        builder.build().to_string()
+        builder.build_document().to_string()
     }
 }
 
@@ -33,7 +33,7 @@ impl ContentBuilder {
         ContentBuilder { content: String::from("") }
     }
 
-    pub fn build(&self) -> &str {
+    pub fn build_document(&self) -> &str {
         &self.content
     }
 
@@ -59,11 +59,11 @@ impl ContentBuilder {
         self.content.push_str(text);
     }
 
-    pub fn begin(&mut self) {
+    pub fn begin_document(&mut self) {
         self.content.push_str("\\begin{document}\n");
     }
 
-    pub fn end(&mut self) {
+    pub fn end_document(&mut self) {
         self.content.push_str("\\end{document}\n");
     }
 
@@ -97,16 +97,34 @@ impl ContentBuilder {
 
     pub fn env<S: StringOrBuilder>(&mut self, env: Environment, content: S) {
         match env {
-            Environment::Abstract => {
-                self.content.push_str("\\begin{abstract}\n");
+            Environment::Abstract
+            |Environment::Center
+            |Environment::Description
+            |Environment::DisplayMath
+            |Environment::Document
+            |Environment::Enumerate
+            |Environment::EqnArray
+            |Environment::Equation => {
+                self.content.push_str(&format!("\\begin{{{}}}\n", env.to_string()));
                 self.content.push_str(&format!("{}\n", content.merge_str()));
-                self.content.push_str("\\end{abstract}\n");
+                self.content.push_str(&format!("\\end{{{}}}\n", env.to_string()));
             },
             Environment::Array(params) => {
                 let pos = params.pos.as_ref().map_or(String::new(), |p| format!("[{}]", p.merge_str()));
-                self.content.push_str(&format!("\\begin{{array}}{}{{{}}}\n", pos, params.cols));
+                self.content.push_str(&format!("\\begin{{{}}}{}{{{}}}\n", env.to_string(), pos, params.cols));
                 self.content.push_str(&format!("{}\n", content.merge_str()));
-                self.content.push_str("\\end{array}\n");
+                self.content.push_str(&format!("\\end{{{}}}\n", env.to_string()));
+            },
+            Environment::Figure(params) => {
+                let placement = if params.placement.is_empty() {
+                    String::new()
+                } else {
+                    format!("[{}]", params.placement)
+                };
+
+                self.content.push_str(&format!("\\begin{{{}}}{}\n", env.to_string(), placement));
+                self.content.push_str(&format!("{}\n", content.merge_str()));
+                self.content.push_str(&format!("\\end{{{}}}\n", env.to_string()));
             }
         }
     }
