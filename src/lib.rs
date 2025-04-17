@@ -174,12 +174,16 @@
 
 #![warn(missing_docs)]
 
+/// This module contains the core models used by RustTeX.
 pub mod models;
+/// This module contains utility functions and macros for RustTeX.
 pub mod utils;
 
 pub use models::*;
 
+/// This trait allows for exchanging Strings and String builders.
 pub trait StringOrBuilder {
+    /// Merges the current instance into a `String`.
     fn merge_str(self) -> String;
 }
 

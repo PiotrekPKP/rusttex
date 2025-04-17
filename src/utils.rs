@@ -1,4 +1,5 @@
 #[macro_export]
+/// A macro to easily mix Strings and enums as options
 macro_rules! options {
     ($($item:expr),*) => {
         vec![
