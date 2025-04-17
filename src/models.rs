@@ -47,7 +47,7 @@ impl ToString for ColorModel {
             ColorModel::CMYK => String::from("cmyk"),
             ColorModel::Gray => String::from("gray"),
             ColorModel::RGB => String::from("rgb"),
-            ColorModel::RGBFull => String::from("rgbfull"),
+            ColorModel::RGBFull => String::from("RGB"),
             ColorModel::Named => String::from("named"),
         }
     }
