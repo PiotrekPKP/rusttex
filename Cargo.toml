@@ -1,7 +1,10 @@
 [package]
 name = "rusttex"
+description = "A Rust library for programmatically generating LaTeX documents"
 version = "0.1.0"
 edition = "2024"
 readme = "README.md"
+repository = "https://github.com/PiotrekPKP/rusttex"
+license = "MIT"
 
 [dependencies]
